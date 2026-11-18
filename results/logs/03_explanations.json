@@ -1,0 +1,20 @@
+{
+  "script": "03_explanations",
+  "started_utc": "2026-11-18T00:28:32+00:00",
+  "versions": {
+    "python": "3.13.7",
+    "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+    "numpy": "2.5.3",
+    "pandas": "3.0.5",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "xgboost": "3.4.1",
+    "shap": "0.54.1"
+  },
+  "notes": [
+    "cases: low_risk=test#153, high_risk=test#385, near_threshold=test#822, disagreement=test#81, special_codes=test#1663",
+    "max XGB additivity error 8.11e-07"
+  ],
+  "elapsed_seconds": 0.3,
+  "finished_utc": "2026-11-18T00:28:33+00:00"
+}

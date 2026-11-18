@@ -1,0 +1,128 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[a4paper,margin=2cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{placeins}
+\usepackage{caption}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+\usepackage{indentfirst}
+\captionsetup{font=small,labelfont=bf,skip=4pt}
+\setlength{\parskip}{2pt}
+\setlength{\parindent}{1.5em}
+\setlength{\bibsep}{1pt}
+\setlength{\emergencystretch}{3em}
+% Generated numerical definitions from this run.
+\input{../results/report_numbers.tex}
+\input{../results/ablation_numbers.tex}
+\newcommand{\var}[1]{{\small\nolinkurl{#1}}}
+
+\title{\vspace{-1.2cm}Interpretable models versus explained black boxes:\\ an empirical look at the debate on FICO HELOC credit-risk data}
+\author{Forecasting course project --- \textit{Black-boxes, explainable AI, interpretable AI}\\
+\small Authors: Zijing LIU, Jiahao WANG, Ziyue WANG, Yirong YANG, Qianwei YU}
+\date{\vspace{-0.4cm}November 2026}
+
+\begin{document}
+\maketitle
+\vspace{-0.6cm}
+\begin{abstract}
+Rudin argues for models that are interpretable by construction in high-stakes settings; Ghassemi et al. stress that explanations cannot certify individual decisions. We connect these positions using the FICO HELOC data (\NPop{} records with bureau information). Under the shared evaluation protocol, L1 logistic regression has test AUC \TestAUCLR{} and XGBoost \TestAUCXGB{}, with an uncertain paired difference; restricted CART is worse (\TestAUCCART{}). Similar averages hide individual differences: \GtTenLRXGB{} of test customers receive logistic and XGBoost probabilities more than 0.10 apart. In a declared exploratory extension, removing an undocumented upstream score and retuning all models leaves logistic and XGBoost AUCs close (\NoScoreAUCLR{} and \NoScoreAUCXGB{}), while \NoScoreChangeTenCART{} of CART probabilities change by more than 0.10. Local attributions for both model families depend on their reference sample, and predictions and explanations vary under refitting. Transparency exposes conditional signs and missing-state routings that merit scrutiny; it does not resolve their validity. The results separate predictive performance, computational inspectability and validation evidence within one historical credit-risk example, without claiming equivalence, user understanding, fairness or deployment readiness.
+\end{abstract}
+
+\section{Introduction and research question}
+Two responses to opaque credit scores compete: explain a fitted black box after the fact, or restrict the model class so that the model is its own explanation \cite{rudin2019stop}. We ask: \emph{on the FICO HELOC credit-risk task, how large is the predictive gap between selected inherently interpretable models and XGBoost, what information do their structures and explanations provide, and which validation gaps remain?} We assume neither side is right, and we separate the reviewed authors' claims and evidence from our own results and inferences, which are limited to one data set and three model families.
+
+\section{Conceptual framework and related work}
+\textbf{Black boxes and two routes to understanding.} Rudin distinguishes models that are black boxes because they are too complicated for a person to follow from models that are proprietary \cite[App.~A]{rudin2019stop}; a proprietary model can be simple and still opaque to the person it scores. Murdoch et al.\ define interpretable machine learning broadly (extracting relevant knowledge from a model) and include ``explainable'' methods under it \cite{murdoch2019definitions}; they separate \emph{model-based} interpretability (constraining the model, e.g.\ sparsity or simulatability) from \emph{post-hoc} interpretability (analysing a fitted model). Ghassemi et al.\ use the parallel terms inherent and post-hoc explainability \cite{ghassemi2021false}. Following Rudin, \emph{interpretable model} here means a model whose computation can be read directly, and \emph{explanation} a separate account of its output.
+
+\textbf{The PDR framework.} Murdoch et al.\ evaluate interpretations by predictive accuracy (how well the model fits), descriptive accuracy (how faithfully an interpretation captures what the model learned) and relevancy (whether it gives insight to a particular audience for a particular problem) \cite{murdoch2019definitions}. They treat stability under reasonable perturbations as a prerequisite for trusting an interpretation. PDR organises our discussion (Sec.~\ref{sec:disc}).
+
+\textbf{Rudin's critique.} Rudin claims that for structured data with meaningful features complex and simple classifiers often perform similarly after preprocessing, so the accuracy--interpretability trade-off is not a law \cite{rudin2019stop}; the claim rests on experience and cited comparisons, not a theorem. She argues that a post-hoc explanation cannot be fully faithful (otherwise it would be the model), may omit what the model does, and makes it hard to combine a score with information outside the database. Her argument for why accurate interpretable models may exist is the Rashomon set: if many near-optimal models exist, one may be simple \cite{rudin2019stop,semenova2022existence}; this motivates a possibility, not a guarantee that a simple model exists or that a given algorithm finds it. The FICO challenge asked for a black box plus explanations, yet a globally interpretable additive model by Chen et al., built from subscales of monotone step functions, received the FICO Recognition Award \cite{rudin2019stop,chen2018interpretable,chen2022holistic}. Interpretable models thus need not be linear models or single trees; we do not reproduce it, and its accuracy (five random 80/20 splits) is not comparable with ours.
+
+\textbf{Ghassemi et al.} Writing about health care, they argue that current local explanations offer descriptive accounts of model behaviour but cannot tell a user whether an individual decision was justified; human intuition fills that gap and can increase over-trust \cite{ghassemi2021false}. Inherently explainable models can also be undermined by confounding and information overload. They see explanations as tools for developers and auditors and advocate rigorous validation. Their evidence is mainly from medical imaging; transfer to credit is our inference.
+
+\textbf{Accountability and non-discrimination.} Goodman and Flaxman interpret European data-protection provisions as motivating an explanation right and discuss the difficulty of preventing discrimination when predictors can serve as proxies \cite{goodman2017eu}. The legal interpretation was contested by Wachter et al.\ \cite{wachter2017right}. We use this historical debate to motivate disclosure of inputs, upstream scores and explanation semantics, not to give an account of current law. Our data lack protected attributes and our experiments do not assess legal compliance or establish non-discrimination. Explanation graphics alone cannot settle those questions.
+
+\section{Data and experimental design}\label{sec:data}
+\textbf{Data.} The FICO HELOC file contains \NRaw{} home-equity credit-line applications with 23 predictors from credit-bureau reports and the label \var{RiskPerformance}. ``Bad'' means 90+ days past due at least once within 24 months of account opening (FICO's description via AIX360 \cite{aix360heloc}); the dictionary we could access says ``paid as negotiated flag (12--36 months)''. Neither is an approval decision; both imply outcomes exist only for opened accounts, so the sample is likely accepted applicants, selected in ways we cannot verify. The official FICO page was unreachable; we used a raw copy byte-identical across three public mirrors and a course copy of the FICO dictionary (\texttt{data/README.md}). Predictors use special codes $-9$ (no bureau record or investigation), $-8$ (no usable/valid trades or inquiries) and $-7$ (condition not met, e.g.\ no delinquencies). \var{ExternalRiskEstimate} is a ``consolidated version of risk markers'' whose construction is not documented, so every full-input model below inherits an opaque upstream score; the extension explicitly removes it.
+
+\textbf{Audit and preprocessing.} \NAllNine{} records have $-9$ in all 23 predictors (\AllNineBadRate{} Bad). They carry no bureau information and are excluded, so conclusions concern applicants with a bureau record. Ten records with $-9$ only in \var{ExternalRiskEstimate} are kept. One identical pair (no identifier to tell whether it is one person) is kept within one split. The modelling population has \NPop{} rows (\BadRatePop{} Bad). Each occurring special code becomes a 0/1 state indicator and the numeric value is set to missing, never used as a negative number. The two delinquency fields are coded categories (e.g.\ codes 5--6 = ``unknown delinquency''), one-hot encoded against ``current and never delinquent''. All models receive the same \NCols{} columns; the logistic pipeline imputes medians and standardises inside each training part, the trees handle missing values natively.
+
+\textbf{Protocol.} We use a stratified 20\% final test set (\NTest{} rows). Its membership is fixed; the main results were inspected before the score-removal analysis, which is exploratory. On the development set (\NDev{}) all models share the same five stratified folds and are selected by mean cross-validated Brier score. Budgets: 20 penalty values for the L1 logistic regression; 80 CART configurations with depth limited to 2--5 by design; 60 random XGBoost configurations, with early stopping on a slice of each training fold only and the final number of trees set to the median stopping point. Selected: $C=\LRC$; CART depth 5, minimum leaf \CARTminleaf{}, pruning $\alpha=\CARTccp$; XGBoost depth \XGBdepth{}, learning rate \XGBeta{}, \XGBntrees{} trees. For split-to-split variation the whole selection was repeated on \NRepeats{} random 75/25 development splits (3-fold inner tuning). Metrics: ROC-AUC, Brier score and log-loss (the latter two measure overall probability quality, not calibration alone), reliability curves and a recalibration slope. Test intervals are paired percentile bootstraps (2,000 resamples) conditional on the fitted models; the overlapping repeated splits are reported descriptively, without significance tests.
+
+\textbf{Explanations.} All attributions are on the log-odds scale of P(Bad) and relative to a fixed reference sample of 200 development rows. For the logistic model the attribution of column $j$ is $w_j(z_j-\bar z_j)$, with $z$ the imputed, standardised input and $\bar z$ its reference mean (exactly interventional SHAP for a linear model). XGBoost is explained by interventional TreeSHAP \cite{lundberg2017unified,lundberg2020local}, which we checked is deterministic and additive (base value plus attributions equals the log-odds). For CART we report the decision path, leaf size and leaf probability. Attributions are summed per original variable (for XGBoost a sum of SHAP values, not a group Shapley value). Cases were selected by rules fixed beforehand, using the mean of the three predicted probabilities on the test set: 5th and 95th percentile, closest to 0.5 for all models, largest disagreement, and most special codes. \emph{Stability.} (A) Retraining: 30 refits with fixed hyperparameters, each on a different 90\% development subsample \emph{and} with a different random seed, so they measure combined refitting variation; the effect of the data alone is not isolated. A second XGBoost arm changes only the seed on the full development set. Without retuning this is \emph{retraining stability}, not a verified Rashomon set. (B) Background: final models fixed, reference redrawn 30 times (50 or 200 rows) from the development set. Both use the same \NEval{} test cases: a stratified random sample of 300 plus the showcase cases not already in it. Measures: top-$k$ overlap of variables ranked by $|$attribution$|$, sign agreement (attributions below 0.01 log-odds count as ``no stable direction''), share of variables with reversed signs, and relative $L_1$ distance; we set no threshold for ``stable''.
+
+\section{Results}\label{sec:results}
+\begin{table}[htbp]
+\centering\small
+\caption{Predictive performance and structure. CV: mean over the 5 development folds for the selected configuration. Repeated: mean\,$\pm$\,s.d.\ over \NRepeats{} development splits with re-tuning. Test: final test set ($n=\NTest$) with 95\% paired-bootstrap intervals. Slope: logistic recalibration slope on test (1 = ideal).}
+\label{tab:pred}
+\input{../results/tables/table1_predictive.tex}
+\vspace{-2mm}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{../results/figures/fig1_predictive.pdf}
+\caption{(a) Reliability curves on the final test set (10 quantile bins). (b, c) Paired differences between models within each repeated development split; each split re-runs model selection.}
+\label{fig:pred}
+\vspace{-3mm}
+\end{figure}
+
+\textbf{Predictive accuracy.} Table~\ref{tab:pred} and Fig.~\ref{fig:pred} summarise the comparison. On the final test set, the AUC difference (logistic minus XGBoost) is \dAUCLRXGB{} (95\% interval \dAUCciLRXGB) and the Brier difference is \dBrierLRXGB{} \dBrierciLRXGB; both intervals include zero. Across the \NRepeats{} development splits, with model selection repeated each time, XGBoost's AUC exceeded the logistic model's in \RepAucDiffPosXGBLR{} splits; the mean difference was \RepAucDiffXGBLR{} (range \RepAucDiffMinXGBLR{} to \RepAucDiffMaxXGBLR{}), and XGBoost's Brier score was higher in \RepBrierDiffPosXGBLR{} splits. The depth-limited CART is worse in every comparison, including all \NRepeats{} development splits (test AUC \TestAUCCART{}, logistic minus CART \dAUCLRCART{} \dAUCciLRCART), and its CV score rose monotonically with the depth limit. This suggests that the imposed depth restriction contributed to the gap; our results concern this restricted CART family. All three models are close to calibrated in the large (mean observed minus mean predicted P(Bad): \CITLLR{}, \CITLCART{} and \CITLXGB{} for logistic, CART and XGBoost); the recalibration slopes below one (Table~\ref{tab:pred}) indicate that predictions are somewhat too extreme, most for CART. Similar AUC does not mean similar individual predictions: the logistic model and XGBoost agree on the label at 0.5 for \AgreeLRXGB{} of test applicants, but \GtTenLRXGB{} receive probabilities more than 0.10 apart (mean absolute difference \MeanAbsLRXGB).
+
+\textbf{What the structures show.} The logistic model has \LRnnz{} non-zero coefficients on \LRvars{} of the 23 variables. It can be inspected in full, but 30 terms do not make it readily simulatable by a typical applicant. Inspection shows two signs that run against the dictionary's monotonicity constraints. Relative to ``current and never delinquent'', the odds ratio for a 120+-day worst-ever delinquency (\var{MaxDelqEver}) is \ORMDEOneTwenty{}, and for a 120+-day delinquency in the last 12 months (\var{MaxDelq2PublicRecLast12M}) \ORMDTwelveOneTwenty{}. Odds ratios are per change of the original column, here a dummy from 0 to 1, i.e.\ $\exp(\text{standardised coefficient}/\text{column s.d.})$. Raw Bad rates for the two \var{MaxDelqEver} categories are \BadRateMDEOneTwenty{} (120+ days) and \BadRateMDENever{} (never delinquent). A higher marginal risk with a negative conditional coefficient among correlated delinquency variables is not a statistical contradiction. The dictionary's constraint concerns the model's response, however, and the first sign was negative in \NegMDEOneTwenty{} of \NRuns{} refits. This stable sign motivates a domain and specification audit; it does not by itself establish a modelling error. The tree has depth \CARTdepth{}, \CARTleaves{} leaves and \CARTvars{} variables; every applicant's decision is a path of at most five tests. XGBoost has \XGBtrees{} trees and \XGBleaves{} leaves and uses all \XGBvars{} variables; its structure cannot be inspected in the same way.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.94\textwidth]{../results/figures/fig2_cases.pdf}
+\caption{Same-case explanations for two pre-selected test applicants, summed per original variable, in log-odds relative to the same 200-row reference sample. Bars: logistic attribution (blue) and XGBoost TreeSHAP (green); the 8 variables shown have the largest $\max(|\text{logistic}|, |\text{TreeSHAP}|)$.}
+\label{fig:cases}
+\vspace{-3mm}
+\end{figure}
+
+\textbf{Same-case explanations} (Fig.~\ref{fig:cases}; all five cases in the supplementary tables). Case~D has the largest disagreement: logistic \CaseDLR{}, XGBoost \CaseDXGB{}, CART \CaseDCART{}. Its tree path tests \var{ExternalRiskEstimate} twice, the age of the oldest trade and the recency of inquiries, and ends in a leaf of \CaseDLeaf{} training applicants. The path is complete and faithful, but it never looks at the low number of satisfactory trades, which both other models treat as a main risk factor. Case~S has \CaseSNSpecial{} special-code states, no \var{ExternalRiskEstimate}, a single trade and \var{AverageMInFile}\,$=$\,\CaseSAvgMInFile{} (the maximum in the data). The logistic model extrapolates linearly, assigning \CaseSLRAvg{} log-odds to that one value, while XGBoost saturates at \CaseSXGBAvg{}. The tree routes \CaseSMissingSplits{} of its \CaseSPathLen{} tests by its learned missing-value direction: a missing bureau score goes to the low-score branch, ``no inquiries'' ($-7$) goes to the ``inquiry within the last month'' branch, and ``no usable revolving trades'' ($-8$) goes to the high revolving-burden branch. These routings are faithful to the model and readable on a single path; XGBoost's default directions can also be inspected, tree by tree, but not as one readable rule. Whether the routings are reasonable is a domain question. Both cases are illustrations, not population evidence.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.94\textwidth]{../results/figures/fig3_stability.pdf}
+\caption{Stability of grouped attributions for \NEval{} fixed test cases. Top rows: refits with a new 90\% development subsample and new seed, or new seed only (hyperparameters fixed). Bottom rows: final model fixed, reference sample redrawn.}
+\label{fig:stab}
+\vspace{-3mm}
+\end{figure}
+
+\textbf{Stability} (Fig.~\ref{fig:stab}). Under combined refitting (new subsample and seed), the mean per-case standard deviation of P(Bad) is \PredSDRtLR{} (logistic), \PredSDRtXGB{} (XGBoost) and \PredSDRtCART{} (CART). The label at 0.5 is not unanimous across the \NRuns{} refits for \FlipRtLR{}, \FlipRtXGB{} and \FlipRtCART{} of cases. The tree always splits first on \var{\CARTrootTop} but has \CARTleavesMin{}--\CARTleavesMax{} leaves (path-variable Jaccard index \PathJacRtCART{}). The logistic model keeps between \LRnnzMin{} and \LRnnzMax{} non-zero coefficients; \LRalways{} columns are always selected, \LRsometimes{} only sometimes, and no selected coefficient ever changes sign. Mean top-3 overlap is \TopThreeRtLR{} for logistic attributions and \TopThreeRtXGB{} for TreeSHAP (\TopThreeSdXGB{} when only XGBoost's seed changes). Clear sign reversals affect \ConflictRtLR{} of active variables per case for the logistic model and \ConflictRtXGB{} for XGBoost. Logistic reversals occur almost only in the two one-hot delinquency fields, whose dummies enter and leave the model; most of its lower sign agreement reflects coefficients that L1 zeroes in some refits. With the model fixed, redrawing a 50-row reference moves the XGBoost base value by s.d.\ \BgBaseSDFiftyXGB{} log-odds; top-3 overlap is \TopThreeBgFiftyXGB{} (TreeSHAP) and \TopThreeBgFiftyLR{} (logistic), and \TopThreeBgTwoXGB{} for TreeSHAP at 200 rows. Changing the reference \emph{population} changes the question: for the near-threshold case T, total attribution is \SwapTAll{} relative to all applicants, \SwapTGood{} relative to Good applicants only and \SwapTBad{} relative to Bad applicants only.
+
+\FloatBarrier
+\input{ablation_section.tex}
+\FloatBarrier
+\section{Discussion and limitations}\label{sec:disc}
+\textbf{Predictive accuracy.} On this data set the L1 logistic model and tuned XGBoost cannot be separated by AUC or Brier score within our test-set intervals, and across development splits the difference is negligible and changes sign. This is consistent with Rudin's claim for this task. It is not evidence for all high-stakes tasks, and it does not extend to every interpretable model: a depth-5 CART is clearly worse, so the answer depends on which interpretable class is chosen. Equal aggregate accuracy leaves room for many near-optimal models whose individual predictions differ, so the choice among them matters for a given applicant in a way aggregate validation does not reveal.
+
+\textbf{Descriptive accuracy.} The full fitted logistic equation (with its preprocessing) and the tree rules expose the prediction mechanism directly. This computational transparency does not ensure that a shortened explanation, such as a few coefficients or one path, is complete or understandable, and both full-input models inherit the undocumented \var{ExternalRiskEstimate}. TreeSHAP is exactly additive and deterministic, so it is not ``wrong'' about the quantity it defines; but that quantity depends on a reference sample, perturbs features independently, and summarises \XGBleaves{} leaves in 23 numbers. Local attributions of the logistic model depend on the reference too, so reference dependence is a property of attribution, not only of black boxes; the logistic equation and the tree path themselves do not depend on a reference. Transparency did let us see a stable counter-intuitive sign and questionable missing-value routings, in line with Rudin's and Murdoch et al.'s argument that interpretable models make flaws detectable. Seeing a possible flaw does not tell whether it is an error, confounding or a real conditional pattern; that requires validation, as Ghassemi et al.\ argue, for interpretable models too.
+
+\textbf{Relevancy.} An applicant needs a short, contestable account of the main factors. A tree path is one candidate representation; the logistic model's 30 terms must be shortened first, and conditional signs and reference choices must be stated or they mislead. A credit officer needs calibrated probabilities and decisions that are stable near the cut-off, which differ across models in our retraining results. An auditor gains most from global structure, which XGBoost offers only through aggregated attributions plus validation. Without a user study we cannot claim that any explanation improves understanding or decisions.
+
+\textbf{Limitations.} One public data set of uncertain sampling and period. No sensitive attributes are available, so we cannot assess discrimination, and their absence does not show its absence \cite{goodman2017eu}. \var{ExternalRiskEstimate} is an undocumented upstream score used by all full-input models; its removal is examined only in the declared exploratory extension. The data and dictionary are secondary copies. Hyperparameter budgets are moderate and we implemented no richer interpretable model. The selected CART lies at the upper end of two grid ranges (depth 5, by design, and minimum leaf size \CARTminleaf{}), and values beyond them were not explored. Bootstrap intervals are conditional on fitted models, and the repeated splits are dependent. The main retraining arm changes data and seed together, and no arm covers the full set of near-optimal models.
+
+\section{Conclusion}
+On the full-input HELOC benchmark, L1 logistic regression and XGBoost have close observed discrimination and overall probability scores, with an uncertain paired difference, while a depth-limited CART is worse. The exploratory removal of the upstream score preserves the observed proximity of the first two models, weakening the suggestion that their proximity is entirely explained by sharing that one score. Yet removal can substantially change individual probabilities, particularly for CART, despite modest aggregate metric changes. The full-input explanation experiments show that reference choice and refitting matter for both linear attributions and TreeSHAP; a readable model can also display stable but questionable behaviour. These findings support seriously considering inspectable alternatives and independently validating every model. They do not establish statistical equivalence, causal explanations, human comprehension, freedom from discrimination or performance in a new deployment population.
+
+\FloatBarrier
+\appendix
+\input{research_appendix.tex}
+\FloatBarrier
+{\footnotesize
+\bibliographystyle{unsrtnat}
+\bibliography{refs}
+}
+\end{document}

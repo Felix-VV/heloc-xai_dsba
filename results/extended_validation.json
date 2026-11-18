@@ -1,0 +1,178 @@
+{
+  "status": "passed",
+  "passed": 34,
+  "total": 34,
+  "tests": [
+    {
+      "name": "exploratory ablation completed",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "same population, test positions, row IDs and labels",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "score and all derived score columns absent",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "test row-ID digest matches extension metadata",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "customer groups stay on one side of original split",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "l1_logreg: saved no-score predictions match fitted model",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "l1_logreg: AUC/Brier/log-loss independently recomputed",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "l1_logreg: model input count is reduced",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "l1_logreg: selection minimizes development CV Brier",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "l1_logreg: individual change summaries match saved rows",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "l1_logreg: full-minus-no-score interval signs and endpoints independently verified",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "cart: saved no-score predictions match fitted model",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "cart: AUC/Brier/log-loss independently recomputed",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "cart: model input count is reduced",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "cart: selection minimizes development CV Brier",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "cart: individual change summaries match saved rows",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "cart: full-minus-no-score interval signs and endpoints independently verified",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "xgboost: saved no-score predictions match fitted model",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "xgboost: AUC/Brier/log-loss independently recomputed",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "xgboost: model input count is reduced",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "xgboost: selection minimizes development CV Brier",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "xgboost: individual change summaries match saved rows",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "xgboost: full-minus-no-score interval signs and endpoints independently verified",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "no-score LR imputation uses development statistics",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "no-score LR centering uses development rows",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "no-score complexity maps transformed coefficients to correct original variables",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "ten paired repeated splits per model",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "repeated auc: correct full-minus-no-score differences",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "repeated brier: correct full-minus-no-score differences",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "repeated logloss: correct full-minus-no-score differences",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "report imports generated baseline and extension numbers and main table",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "report contains no stale assets directory references",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "all seven figure groups exist in PDF/PNG/SVG",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "full and no-score test membership and labels identical",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "skipped": []
+}

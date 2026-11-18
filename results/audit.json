@@ -1,0 +1,52 @@
+{
+  "raw_audit": {
+    "n_rows": 10459,
+    "n_predictors": 23,
+    "label_counts": {
+      "Bad": 5459,
+      "Good": 5000
+    },
+    "all_minus9_rows": 588,
+    "all_minus9_label_counts": {
+      "Bad": 323,
+      "Good": 265
+    },
+    "rows_with_any_minus9_not_all": 10,
+    "exact_duplicate_rows_total": 587,
+    "exact_duplicate_rows_excluding_all_minus9": 1,
+    "unexpected_negative_values": {},
+    "duplicate_groups_with_conflicting_labels": 0,
+    "duplicate_row_indices_excluding_all_minus9": [
+      5423,
+      5424
+    ]
+  },
+  "population": {
+    "n_population": 9871,
+    "n_features_design": 46,
+    "n_original_variables": 23,
+    "excluded": {
+      "all_predictors_minus9": 588
+    },
+    "bad_rate_population": 0.5203120251241009,
+    "n_dev": 7896,
+    "n_test": 1975,
+    "bad_rate_dev": 0.5202634245187436,
+    "bad_rate_test": 0.520506329113924,
+    "groups_with_more_than_one_row": 1,
+    "special_state_rows_excluding_all9": {
+      "ExternalRiskEstimate==-9": 10,
+      "MSinceOldestTradeOpen==-8": 239,
+      "MSinceMostRecentDelq==-7": 4664,
+      "MSinceMostRecentDelq==-8": 176,
+      "MSinceMostRecentInqexcl7days==-7": 1855,
+      "MSinceMostRecentInqexcl7days==-8": 476,
+      "NetFractionRevolvingBurden==-8": 186,
+      "NetFractionInstallBurden==-8": 3419,
+      "NumRevolvingTradesWBalance==-8": 156,
+      "NumInstallTradesWBalance==-8": 861,
+      "NumBank2NatlTradesWHighUtilization==-8": 583,
+      "PercentTradesWBalance==-8": 18
+    }
+  }
+}

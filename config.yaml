@@ -1,0 +1,116 @@
+# Common split, search and evaluation settings for the main comparison.
+# The score-removal extension reuses these settings but is exploratory;
+# it was specified after inspection of the main results (docs/Protocol.md).
+
+seed: 2026
+
+data:
+  raw_path: data/raw/heloc_dataset_v1.csv
+  sha256: e5a914f742ad7f8472c5417902ec06b321ebc5de1d68ec13f136d62c87a7fbf3
+  target: RiskPerformance
+  positive_label: Bad          # y = 1 means "Bad" (90+ days past due); models output P(Bad)
+  # Rows whose 23 predictors are all -9 ("No Bureau Record or No Investigation")
+  # are excluded to define a population with bureau information. This is a
+  # scope restriction, not evidence that missingness cannot predict the target.
+  exclude_all_special_9: true
+
+  # Coded categorical fields. Levels grouped exactly as in the data dictionary
+  # ("5, 6" and "8, 9" share a meaning there). The reference level is dropped.
+  categorical:
+    MaxDelq2PublicRecLast12M:
+      reference: current_never_delq
+      levels:
+        derogatory: [0]
+        delq_120plus: [1]
+        delq_90: [2]
+        delq_60: [3]
+        delq_30: [4]
+        unknown_delq: [5, 6]
+        current_never_delq: [7]
+        all_other: [8, 9]
+    MaxDelqEver:
+      reference: current_never_delq
+      levels:
+        no_such_value: [1]
+        derogatory: [2]
+        delq_120plus: [3]
+        delq_90: [4]
+        delq_60: [5]
+        delq_30: [6]
+        unknown_delq: [7]
+        current_never_delq: [8]
+        all_other: [9]
+
+  # (variable, special code) pairs that occur after excluding all -9 rows
+  # (from scripts/01_audit.py; label information is not used). Each becomes a
+  # 0/1 state indicator; the numeric value is set to missing.
+  special_indicators:
+    ExternalRiskEstimate: [-9]
+    MSinceOldestTradeOpen: [-8]
+    MSinceMostRecentDelq: [-7, -8]
+    MSinceMostRecentInqexcl7days: [-7, -8]
+    NetFractionRevolvingBurden: [-8]
+    NetFractionInstallBurden: [-8]
+    NumRevolvingTradesWBalance: [-8]
+    NumInstallTradesWBalance: [-8]
+    NumBank2NatlTradesWHighUtilization: [-8]
+    PercentTradesWBalance: [-8]
+
+split:
+  test_size: 0.20              # fixed stratified test membership; exploratory reuse disclosed
+  cv_folds: 5                  # shared stratified folds on the development set
+  repeated:                    # split-variability study inside the development set
+    n_repeats: 10
+    holdout_size: 0.25
+    inner_folds: 3
+
+selection:
+  metric: brier                # proper, bounded scoring rule; lower is better
+
+models:
+  l1_logreg:
+    C_grid: {logspace: [-3, 1, 20]}
+    solver: saga
+    max_iter: 20000
+    tol: 1.0e-4
+  cart:
+    max_depth: [2, 3, 4, 5]    # "shallow" fixed by design, not tuned beyond depth 5
+    min_samples_leaf: [25, 50, 100, 200]
+    ccp_alpha: [0.0, 1.0e-4, 5.0e-4, 1.0e-3, 2.0e-3]
+  xgboost:
+    n_random_configs: 60
+    max_estimators: 2000
+    early_stopping_rounds: 50
+    early_stopping_fraction: 0.15   # carved out of each training part only
+    space:
+      max_depth: {int: [2, 6]}
+      learning_rate: {loguniform: [0.01, 0.3]}
+      subsample: {uniform: [0.6, 1.0]}
+      colsample_bytree: {uniform: [0.5, 1.0]}
+      min_child_weight: {loguniform: [1, 30]}
+      reg_lambda: {loguniform: [0.1, 20]}
+      reg_alpha: {loguniform: [0.001, 5]}
+
+evaluation:
+  bootstrap_resamples: 2000
+  calibration_bins: 10
+  decision_threshold: 0.5     # used only for case selection and flip counts
+
+explanation:
+  background_size: 200        # dev-set rows, fixed seed; reference population = development set
+  case_rules:                 # applied to mean P(Bad) of the three models on the test set
+    low_risk_quantile: 0.05
+    high_risk_quantile: 0.95
+    near_threshold: 0.5
+    min_special_states: 2
+
+stability:
+  eval_cases: 300             # fixed stratified subset of the test set
+  retrain:
+    n_runs: 30
+    subsample_fraction: 0.9   # of the development set, without replacement
+  background:
+    n_draws: 30
+    sizes: [50, 200]
+  top_k: [3, 5]
+  near_zero: 0.01             # |attribution| in log-odds below which signs are not compared

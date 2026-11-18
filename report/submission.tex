@@ -1,0 +1,94 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[a4paper,margin=2cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype,amsmath,graphicx,booktabs,array,xurl}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[hidelinks]{hyperref}
+\usepackage{caption}
+\captionsetup{font=small,labelfont=bf}
+\setlength{\parindent}{1.3em}
+\setlength{\parskip}{2pt}
+\setlength{\bibsep}{1pt}
+\setlength{\emergencystretch}{3em}
+\input{../results/report_numbers.tex}
+\input{../results/ablation_numbers.tex}
+\newcommand{\var}[1]{{\small\nolinkurl{#1}}}
+\title{\vspace{-1.2cm}Interpretable models and explained black boxes:\\a credit-risk case study}
+\author{Zijing LIU, Jiahao WANG, Ziyue WANG, Yirong YANG, Qianwei YU}
+\date{November 2026}
+\begin{document}
+\maketitle
+\vspace{-0.7cm}
+\begin{abstract}
+We compare L1 logistic regression, depth-limited CART and XGBoost on FICO HELOC credit-risk data, separating prediction quality, inspectability and validation. Logistic regression and XGBoost have close observed test AUCs (\TestAUCLR{} and \TestAUCXGB{}), while CART performs worse. An exploratory removal of an undocumented upstream score preserves that proximity, but substantially changes many individual CART probabilities. Refitting and reference-sample analyses reveal different sources of variation in explanations. These results support considering inspectable alternatives and auditing their behaviour, without establishing model equivalence, causal explanations or deployment validity.
+\end{abstract}
+
+\section{Question and conceptual framework}
+We ask how much predictive performance differs between selected interpretable models and XGBoost, what their structures and explanations reveal, and which validation gaps remain. This is a controlled empirical comparison and model audit, not a new algorithm.
+
+Rudin argues against assuming an unavoidable accuracy--interpretability trade-off in high-stakes structured prediction and advocates inherently interpretable alternatives \cite{rudin2019stop}. Murdoch et al.'s predictive--descriptive--relevant (PDR) framework distinguishes predictive quality, faithful description of learned relationships and usefulness to a particular audience \cite{murdoch2019definitions}. Ghassemi et al. emphasise that local explanations cannot certify individual decisions and that validation must carry that burden; their medical evidence is not direct credit evidence \cite{ghassemi2021false}. Goodman and Flaxman motivate explanation and non-discrimination requirements \cite{goodman2017eu}; we do not assess current legal compliance.
+
+Here, logistic regression and CART expose a fitted equation or decision path; XGBoost is computationally complex and is analysed with post-hoc TreeSHAP. The terminology is operational, not universal. Nonlinear interpretable alternatives also exist \cite{chen2022holistic}, but are outside our implemented model classes. Inspectable computation is not necessarily easy for an applicant to understand.
+
+\section{Data and experimental protocol}
+HELOC contains \NRaw{} records and 23 bureau predictors. We encode Bad as 1. FICO's description through IBM AIX360 defines Bad as 90+ days past due at least once within 24 months of account opening \cite{aix360heloc}; the available dictionary says 12--36 months. Official originals were unavailable, so we disclose this discrepancy and use a raw secondary copy verified by SHA-256. The target is repayment performance, not approval; sampling and acceptance selection cannot be verified.
+
+We exclude \NAllNine{} records with all predictors equal to $-9$, restricting inference to \NPop{} records with bureau information (\BadRatePop{} Bad). Special codes $-7$, $-8$ and $-9$ denote different states, not ordinary negative values: numeric entries become missing with explicit indicators. Two coded delinquency fields are one-hot encoded, yielding \NCols{} shared inputs. An exact duplicate pair is kept within one split. Logistic imputation and standardisation are fitted only on training portions; trees handle missing inputs natively.
+
+A group-aware stratified split reserves \NTest{} test records; \NDev{} development records share five CV folds. Mean CV Brier selects among 20 logistic penalties, 80 CART configurations (depth 2--5) and 60 XGBoost configurations. XGBoost stops on a training-fold internal slice; the final tree count is the median selected stopping point. Ten additional 75/25 development splits repeat selection with three inner folds. They overlap and are reported descriptively. Test paired percentile bootstrap intervals use 2,000 resamples and condition on fitted models. AUC measures ranking; Brier and log-loss measure overall probability quality, not calibration alone. Reliability and recalibration slopes are diagnostic, not test-set recalibration.
+
+\section{Prediction, explanations and sensitivity}
+Table~\ref{tab:results} reports final-test results. The logistic-minus-XGBoost AUC difference is \dAUCLRXGB{} (95\% interval \dAUCciLRXGB); its Brier difference is \dBrierLRXGB{} \dBrierciLRXGB. Inclusion of zero does not establish equivalence. Across development splits, their mean AUC difference (XGBoost minus logistic) is \RepAucDiffXGBLR{}. Restricted CART performs worse; this does not generalise to all interpretable models.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Test performance with all inputs and after score removal. No-score models are independently retuned; these comparisons are exploratory.}
+\label{tab:results}
+\input{../results/tables/table2_ablation.tex}
+\end{table}
+
+Aggregate proximity hides individual differences: \GtTenLRXGB{} of test customers receive logistic and XGBoost probabilities more than 0.10 apart. The full logistic model has \LRnnz{} non-zero coefficients on \LRvars{} original variables; CART has depth \CARTdepth{} and \CARTleaves{} leaves; XGBoost has \XGBtrees{} trees. These describe structure, not a common human-understanding score.
+
+For the same rule-selected cases we examine logistic contributions, complete CART paths with leaf support, and TreeSHAP \cite{lundberg2020local}. Contributions are on the log-odds scale relative to 200 development records. TreeSHAP is deterministic for fixed inputs/settings and passes output reconstruction; neither property proves causal meaning or complete descriptive accuracy. Column contributions are summed to original variables, not recomputed as group Shapley values. Independent perturbations may create invalid joint encoded states. Readable paths also expose questionable missing-value routings. A stable negative coefficient for a severe-delinquency category motivates domain review; correlated conditional effects mean it is not automatically an error.
+
+Figure~\ref{fig:cases} illustrates why inspecting mechanism adds information beyond an AUC comparison. For the maximum-disagreement case, logistic regression, XGBoost and CART assign \CaseDLR{}, \CaseDXGB{} and \CaseDCART{} risk. The complete CART path does not inspect satisfactory-trade count, a leading factor for the other models. In the special-code case, a missing score follows the low-score branch, ``no inquiries'' follows the recent-inquiry branch, and no usable revolving trades follows the high-burden branch. These are learned missing-input routings, not imputations of actual customer characteristics. They can be reproduced and questioned without establishing which prediction is correct for that individual.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.95\textwidth]{../results/figures/fig2_cases.pdf}
+\caption{Two rule-selected cases. Bars compare grouped logistic and XGBoost log-odds contributions against the same reference. The complete CART paths and all five cases accompany the research notes. Illustrations are not representative population evidence.}
+\label{fig:cases}
+\end{figure}
+
+Thirty fixed-hyperparameter refits vary both a 90\% development subsample and seed, measuring combined variation; a separate XGBoost arm varies only seed. In \NEval{} fixed cases, mean prediction standard deviations are \PredSDRtLR{}, \PredSDRtCART{} and \PredSDRtXGB{}. No formal Rashomon set is constructed. With models fixed, 30 background redraws from the same population examine reference estimation separately (Fig.~\ref{fig:stability}). XGBoost top-3 variable overlap rises from \TopThreeBgFiftyXGB{} at 50 background records to \TopThreeBgTwoXGB{} at 200. Logistic contributions also depend on reference samples, although its equation does not. Changing the reference population changes the question rather than merely adding algorithmic noise.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{../results/figures/fig3_stability.pdf}
+\caption{Grouped attribution stability. Refits change data and seed together; seed-only and background-redraw arms isolate other settings. Boxplots describe cases, not confidence that an explanation is correct.}
+\label{fig:stability}
+\end{figure}
+
+\section{Exploratory upstream-score ablation}
+All full-input models inherit \var{ExternalRiskEstimate}, whose construction is undocumented. We therefore remove the score and its derived indicator, keep all customer/split memberships, and retune all three families on the same grids. There are \NNoScoreVars{} remaining variables and \NNoScoreCols{} encoded columns. The analysis was designed after inspecting the main results and is exploratory.
+
+The XGBoost-minus-logistic AUC gap is \GapFullXGBLR{} with the score and \GapNoScoreXGBLR{} without it. Their observed proximity therefore does not disappear on removal. Full-minus-no-score AUC intervals for logistic regression, CART and XGBoost are \ScoreDeltaAUCciLR{}, \ScoreDeltaAUCciCART{} and \ScoreDeltaAUCciXGB{}, respectively. These do not establish zero incremental value. In ten paired development splits, keeping the score gives higher AUC in \RepScoreAUCPosLR{} logistic, \RepScoreAUCPosCART{} CART and \RepScoreAUCPosXGB{} XGBoost comparisons. Remaining features may substitute for the score.
+
+Individual probabilities change by more than 0.10 for \NoScoreChangeTenLR{}, \NoScoreChangeTenCART{} and \NoScoreChangeTenXGB{} of test customers (Fig.~\ref{fig:individual}). CART's small aggregate change thus coexists with substantial reassignment of risk. This compares independently retuned models, not a frozen-model intervention or a causal effect on customers. The 0.5 threshold is descriptive, not an optimal lending policy.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{../results/figures/fig5_ablation_individual.pdf}
+\caption{Same customers before and after score removal/refitting. The diagonal indicates unchanged probabilities. Colours are observed outcomes, not protected groups.}
+\label{fig:individual}
+\end{figure}
+
+\section{Discussion, limitations and conclusion}
+For PDR, predictive evidence supports considering logistic regression as an alternative in this task. Equations, paths and attributions provide inspectable information, but additivity and stability are not sufficient tests of descriptive quality. Audience relevance remains untested: developers, applicants and auditors need different information, and no user study was conducted. This supports Rudin's call to attempt interpretable alternatives while retaining Ghassemi et al.'s insistence on validation. Our reusable contribution is the comparison-and-audit workflow and its evidence, not an automatic deployment rule.
+
+One historical dataset of uncertain sampling, secondary source material, limited model families and moderate tuning budgets restrict generalisation. No protected attributes are available, so fairness cannot be established. There is no temporal, institutional or prospective external validation, nor a decision-cost analysis. Similar average performance does not imply similar individual predictions, formal equivalence or deployment suitability. The score-removal extension strengthens one case-specific comparison without resolving all upstream opacity or the wider debate.
+
+\noindent\textbf{Code availability.} Source, locked dependencies, saved results and reproduction instructions accompany the submission in \texttt{02\_Code/}; see \texttt{README.md} and \texttt{run\_all.sh}. Full methods, additional figures and editable sources are included in the research materials.
+
+{\small\bibliographystyle{unsrtnat}\bibliography{refs}}
+\end{document}

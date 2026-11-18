@@ -1,0 +1,52 @@
+|--- ExternalRiskEstimate <= 73.5
+|   |--- ExternalRiskEstimate <= 67.5
+|   |   |--- MSinceMostRecentInqexcl7days <= 0.5
+|   |   |   |--- NetFractionRevolvingBurden <= 54.5
+|   |   |   |   |--- MSinceOldestTradeOpen <= 158.5
+|   |   |   |   |   |--- class: 1
+|   |   |   |   |--- MSinceOldestTradeOpen >  158.5
+|   |   |   |   |   |--- class: 1
+|   |   |   |--- NetFractionRevolvingBurden >  54.5
+|   |   |   |   |--- AverageMInFile <= 80.5
+|   |   |   |   |   |--- class: 1
+|   |   |   |   |--- AverageMInFile >  80.5
+|   |   |   |   |   |--- class: 1
+|   |   |--- MSinceMostRecentInqexcl7days >  0.5
+|   |   |   |--- ExternalRiskEstimate <= 63.5
+|   |   |   |   |--- class: 1
+|   |   |   |--- ExternalRiskEstimate >  63.5
+|   |   |   |   |--- class: 1
+|   |--- ExternalRiskEstimate >  67.5
+|   |   |--- AverageMInFile <= 51.5
+|   |   |   |--- class: 1
+|   |   |--- AverageMInFile >  51.5
+|   |   |   |--- MSinceMostRecentInqexcl7days <= 0.5
+|   |   |   |   |--- NetFractionRevolvingBurden <= 28.5
+|   |   |   |   |   |--- class: 0
+|   |   |   |   |--- NetFractionRevolvingBurden >  28.5
+|   |   |   |   |   |--- class: 1
+|   |   |   |--- MSinceMostRecentInqexcl7days >  0.5
+|   |   |   |   |--- class: 0
+|--- ExternalRiskEstimate >  73.5
+|   |--- ExternalRiskEstimate <= 80.5
+|   |   |--- NumSatisfactoryTrades <= 15.5
+|   |   |   |--- MSinceMostRecentInqexcl7days <= 0.5
+|   |   |   |   |--- class: 1
+|   |   |   |--- MSinceMostRecentInqexcl7days >  0.5
+|   |   |   |   |--- class: 0
+|   |   |--- NumSatisfactoryTrades >  15.5
+|   |   |   |--- MSinceMostRecentInqexcl7days <= 1.5
+|   |   |   |   |--- AverageMInFile <= 81.5
+|   |   |   |   |   |--- class: 0
+|   |   |   |   |--- AverageMInFile >  81.5
+|   |   |   |   |   |--- class: 0
+|   |   |   |--- MSinceMostRecentInqexcl7days >  1.5
+|   |   |   |   |--- class: 0
+|   |--- ExternalRiskEstimate >  80.5
+|   |   |--- MSinceOldestTradeOpen <= 134.5
+|   |   |   |--- class: 0
+|   |   |--- MSinceOldestTradeOpen >  134.5
+|   |   |   |--- MSinceMostRecentInqexcl7days <= 0.5
+|   |   |   |   |--- class: 0
+|   |   |   |--- MSinceMostRecentInqexcl7days >  0.5
+|   |   |   |   |--- class: 0

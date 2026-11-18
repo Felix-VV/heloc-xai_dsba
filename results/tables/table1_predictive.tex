@@ -1,0 +1,9 @@
+\begin{tabular}{@{}p{1.9cm}ccp{2.0cm}p{2.15cm}cp{3.4cm}@{}}
+\toprule
+Model & CV AUC & Repeated AUC & Test AUC & Test Brier & Slope & Structure \\
+\midrule
+L1 logistic & \CVAUCLR & \RepAUCLR\,$\pm$\,\RepAUCsdLR & \TestAUCLR \newline {\scriptsize \AUCciLR} & \TestBrierLR \newline {\scriptsize \BrierciLR} & \CalSlopeLR & 30 non-zero coef.; 19 variables \\
+CART & \CVAUCCART & \RepAUCCART\,$\pm$\,\RepAUCsdCART & \TestAUCCART \newline {\scriptsize \AUCciCART} & \TestBrierCART \newline {\scriptsize \BrierciCART} & \CalSlopeCART & depth 5, 18 leaves; 6 variables \\
+XGBoost & \CVAUCXGB & \RepAUCXGB\,$\pm$\,\RepAUCsdXGB & \TestAUCXGB \newline {\scriptsize \AUCciXGB} & \TestBrierXGB \newline {\scriptsize \BrierciXGB} & \CalSlopeXGB & 290 trees, 2,255 leaves; 23 variables \\
+\bottomrule
+\end{tabular}

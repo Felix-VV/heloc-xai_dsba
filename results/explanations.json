@@ -1,0 +1,260 @@
+{
+  "rules": {
+    "low_risk_quantile": 0.05,
+    "high_risk_quantile": 0.95,
+    "near_threshold": 0.5,
+    "min_special_states": 2
+  },
+  "chosen_test_index": {
+    "low_risk": 153,
+    "high_risk": 385,
+    "near_threshold": 822,
+    "disagreement": 81,
+    "special_codes": 1663
+  },
+  "cart_paths": {
+    "low_risk": {
+      "steps": [
+        {
+          "node": 0,
+          "column": "ExternalRiskEstimate",
+          "threshold": 73.5,
+          "value": 84.0,
+          "routed": "value",
+          "direction": ">",
+          "missing_go_left": true
+        },
+        {
+          "node": 20,
+          "column": "ExternalRiskEstimate",
+          "threshold": 80.5,
+          "value": 84.0,
+          "routed": "value",
+          "direction": ">",
+          "missing_go_left": false
+        },
+        {
+          "node": 30,
+          "column": "MSinceOldestTradeOpen",
+          "threshold": 134.5,
+          "value": 163.0,
+          "routed": "value",
+          "direction": ">",
+          "missing_go_left": true
+        },
+        {
+          "node": 32,
+          "column": "MSinceMostRecentInqexcl7days",
+          "threshold": 0.5,
+          "value": 12.0,
+          "routed": "value",
+          "direction": ">",
+          "missing_go_left": false
+        }
+      ],
+      "leaf": 34,
+      "leaf_train_samples": 1025,
+      "leaf_p_bad": 0.13463414634146342
+    },
+    "high_risk": {
+      "steps": [
+        {
+          "node": 0,
+          "column": "ExternalRiskEstimate",
+          "threshold": 73.5,
+          "value": 61.0,
+          "routed": "value",
+          "direction": "<=",
+          "missing_go_left": true
+        },
+        {
+          "node": 1,
+          "column": "ExternalRiskEstimate",
+          "threshold": 67.5,
+          "value": 61.0,
+          "routed": "value",
+          "direction": "<=",
+          "missing_go_left": true
+        },
+        {
+          "node": 2,
+          "column": "MSinceMostRecentInqexcl7days",
+          "threshold": 0.5,
+          "value": null,
+          "routed": "missing",
+          "direction": "<=",
+          "missing_go_left": true
+        },
+        {
+          "node": 3,
+          "column": "NetFractionRevolvingBurden",
+          "threshold": 54.5,
+          "value": 90.0,
+          "routed": "value",
+          "direction": ">",
+          "missing_go_left": false
+        },
+        {
+          "node": 7,
+          "column": "AverageMInFile",
+          "threshold": 80.5,
+          "value": 43.0,
+          "routed": "value",
+          "direction": "<=",
+          "missing_go_left": true
+        }
+      ],
+      "leaf": 8,
+      "leaf_train_samples": 842,
+      "leaf_p_bad": 0.8847980997624703
+    },
+    "near_threshold": {
+      "steps": [
+        {
+          "node": 0,
+          "column": "ExternalRiskEstimate",
+          "threshold": 73.5,
+          "value": 70.0,
+          "routed": "value",
+          "direction": "<=",
+          "missing_go_left": true
+        },
+        {
+          "node": 1,
+          "column": "ExternalRiskEstimate",
+          "threshold": 67.5,
+          "value": 70.0,
+          "routed": "value",
+          "direction": ">",
+          "missing_go_left": true
+        },
+        {
+          "node": 13,
+          "column": "AverageMInFile",
+          "threshold": 51.5,
+          "value": 68.0,
+          "routed": "value",
+          "direction": ">",
+          "missing_go_left": false
+        },
+        {
+          "node": 15,
+          "column": "MSinceMostRecentInqexcl7days",
+          "threshold": 0.5,
+          "value": 0.0,
+          "routed": "value",
+          "direction": "<=",
+          "missing_go_left": true
+        },
+        {
+          "node": 16,
+          "column": "NetFractionRevolvingBurden",
+          "threshold": 28.5,
+          "value": 4.0,
+          "routed": "value",
+          "direction": "<=",
+          "missing_go_left": false
+        }
+      ],
+      "leaf": 17,
+      "leaf_train_samples": 307,
+      "leaf_p_bad": 0.48859934853420195
+    },
+    "disagreement": {
+      "steps": [
+        {
+          "node": 0,
+          "column": "ExternalRiskEstimate",
+          "threshold": 73.5,
+          "value": 81.0,
+          "routed": "value",
+          "direction": ">",
+          "missing_go_left": true
+        },
+        {
+          "node": 20,
+          "column": "ExternalRiskEstimate",
+          "threshold": 80.5,
+          "value": 81.0,
+          "routed": "value",
+          "direction": ">",
+          "missing_go_left": false
+        },
+        {
+          "node": 30,
+          "column": "MSinceOldestTradeOpen",
+          "threshold": 134.5,
+          "value": 146.0,
+          "routed": "value",
+          "direction": ">",
+          "missing_go_left": true
+        },
+        {
+          "node": 32,
+          "column": "MSinceMostRecentInqexcl7days",
+          "threshold": 0.5,
+          "value": 0.0,
+          "routed": "value",
+          "direction": "<=",
+          "missing_go_left": false
+        }
+      ],
+      "leaf": 33,
+      "leaf_train_samples": 581,
+      "leaf_p_bad": 0.22030981067125646
+    },
+    "special_codes": {
+      "steps": [
+        {
+          "node": 0,
+          "column": "ExternalRiskEstimate",
+          "threshold": 73.5,
+          "value": null,
+          "routed": "missing",
+          "direction": "<=",
+          "missing_go_left": true
+        },
+        {
+          "node": 1,
+          "column": "ExternalRiskEstimate",
+          "threshold": 67.5,
+          "value": null,
+          "routed": "missing",
+          "direction": "<=",
+          "missing_go_left": true
+        },
+        {
+          "node": 2,
+          "column": "MSinceMostRecentInqexcl7days",
+          "threshold": 0.5,
+          "value": null,
+          "routed": "missing",
+          "direction": "<=",
+          "missing_go_left": true
+        },
+        {
+          "node": 3,
+          "column": "NetFractionRevolvingBurden",
+          "threshold": 54.5,
+          "value": null,
+          "routed": "missing",
+          "direction": ">",
+          "missing_go_left": false
+        },
+        {
+          "node": 7,
+          "column": "AverageMInFile",
+          "threshold": 80.5,
+          "value": 383.0,
+          "routed": "value",
+          "direction": ">",
+          "missing_go_left": true
+        }
+      ],
+      "leaf": 9,
+      "leaf_train_samples": 342,
+      "leaf_p_bad": 0.7894736842105263
+    }
+  },
+  "background_size": 200
+}

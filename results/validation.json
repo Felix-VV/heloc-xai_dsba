@@ -1,0 +1,87 @@
+{
+  "status": "passed",
+  "checked_utc": "2026-11-18T12:22:45.042077+00:00",
+  "scope": "Final-delivery audit of completed experiments. Fitted models and the hash-checked raw CSV were used locally for model checks; they are excluded from distribution. This packaging audit regenerated reports and verified saved evidence; it did not retrain all models again.",
+  "checks": {
+    "main_model_checks": {
+      "passed": 24,
+      "total": 24,
+      "evidence": "logs/06_checks.txt"
+    },
+    "score_ablation_checks": {
+      "passed": 34,
+      "total": 34,
+      "evidence": "extended_validation.json"
+    },
+    "independent_saved_output_checks": {
+      "passed": 20,
+      "total": 20,
+      "evidence": "saved_results_validation.json"
+    },
+    "report_only_pipeline": "complete",
+    "data_sha256_verified": true,
+    "python_sources_parse": true,
+    "editable_sources_compile_and_match_delivered_pdf_text": true,
+    "isolated_code_folder": {
+      "status": "passed",
+      "mode": "report-only",
+      "raw_data_present": false,
+      "fitted_models_present": false,
+      "research_sibling_present": false,
+      "pdf_text_matches_delivery": true,
+      "runtime_note": "Used an existing Python environment and cached TeX toolchain; this was not a fresh package-installation test.",
+      "completed_utc": "2026-11-18T12:23:07.995416+00:00"
+    }
+  },
+  "pdf_review": {
+    "Report.pdf": {
+      "pages": 5,
+      "sha256": "7fb0e336d35fbf04cd3eca3ce80b609901052bc71a3a839ea80a4ffb8725a280",
+      "reviewed_pages": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    "Research_Notes.pdf": {
+      "pages": 11,
+      "sha256": "50386f65025ed5f8fcd9dd8c48cf0903889dd3d9c17d63a5cc8f8e3110afcb6f",
+      "reviewed_pages": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ]
+    },
+    "method": "Rendered all pages, visually inspected contact sheets and detailed table/case/stability pages; no clipped content, unresolved references, replacement glyphs or overfull TeX boxes."
+  },
+  "scientific_reporting": {
+    "exploratory_score_removal_disclosed": true,
+    "no_causal_or_equivalence_claim": true,
+    "overlapping_repeats_and_conditional_intervals_disclosed": true,
+    "target_dictionary_discrepancy_and_secondary_sources_disclosed": true,
+    "external_validation_fairness_user_study_not_claimed": true,
+    "four_readings_distinguished": true
+  },
+  "course_alignment": {
+    "topic": 8,
+    "own_numerical_experiments": true,
+    "code_reference": true,
+    "submission_report_pages": 5,
+    "complete_notes_separate": true,
+    "remaining_team_work": [
+      "Prepare slides and rehearse 15-minute presentation plus 5-minute discussion",
+      "Verify instructor agreement and actual deadlines",
+      "Upload code and insert the real repository URL into final submission"
+    ]
+  }
+}

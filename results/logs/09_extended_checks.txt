@@ -1,0 +1,36 @@
+PASS exploratory ablation completed
+PASS same population, test positions, row IDs and labels
+PASS score and all derived score columns absent
+PASS test row-ID digest matches extension metadata
+PASS customer groups stay on one side of original split
+PASS l1_logreg: saved no-score predictions match fitted model
+PASS l1_logreg: AUC/Brier/log-loss independently recomputed
+PASS l1_logreg: model input count is reduced
+PASS l1_logreg: selection minimizes development CV Brier
+PASS l1_logreg: individual change summaries match saved rows
+PASS l1_logreg: full-minus-no-score interval signs and endpoints independently verified
+PASS cart: saved no-score predictions match fitted model
+PASS cart: AUC/Brier/log-loss independently recomputed
+PASS cart: model input count is reduced
+PASS cart: selection minimizes development CV Brier
+PASS cart: individual change summaries match saved rows
+PASS cart: full-minus-no-score interval signs and endpoints independently verified
+PASS xgboost: saved no-score predictions match fitted model
+PASS xgboost: AUC/Brier/log-loss independently recomputed
+PASS xgboost: model input count is reduced
+PASS xgboost: selection minimizes development CV Brier
+PASS xgboost: individual change summaries match saved rows
+PASS xgboost: full-minus-no-score interval signs and endpoints independently verified
+PASS no-score LR imputation uses development statistics
+PASS no-score LR centering uses development rows
+PASS no-score complexity maps transformed coefficients to correct original variables
+PASS ten paired repeated splits per model
+PASS repeated auc: correct full-minus-no-score differences
+PASS repeated brier: correct full-minus-no-score differences
+PASS repeated logloss: correct full-minus-no-score differences
+PASS report imports generated baseline and extension numbers and main table
+PASS report contains no stale assets directory references
+PASS all seven figure groups exist in PDF/PNG/SVG
+PASS full and no-score test membership and labels identical
+
+34/34 checks passed

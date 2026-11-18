@@ -1,0 +1,88 @@
+{
+  "status": "passed",
+  "checks": [
+    {
+      "name": "same test customers and labels in both conditions",
+      "passed": true
+    },
+    {
+      "name": "complete binary test labels and expected sample count",
+      "passed": true
+    },
+    {
+      "name": "l1_logreg/full: saved metrics independently recomputed",
+      "passed": true
+    },
+    {
+      "name": "l1_logreg/no_score: saved metrics independently recomputed",
+      "passed": true
+    },
+    {
+      "name": "cart/full: saved metrics independently recomputed",
+      "passed": true
+    },
+    {
+      "name": "cart/no_score: saved metrics independently recomputed",
+      "passed": true
+    },
+    {
+      "name": "xgboost/full: saved metrics independently recomputed",
+      "passed": true
+    },
+    {
+      "name": "xgboost/no_score: saved metrics independently recomputed",
+      "passed": true
+    },
+    {
+      "name": "l1_logreg-cart_auc: paired interval independently recomputed",
+      "passed": true
+    },
+    {
+      "name": "l1_logreg-cart_brier: paired interval independently recomputed",
+      "passed": true
+    },
+    {
+      "name": "l1_logreg-xgboost_auc: paired interval independently recomputed",
+      "passed": true
+    },
+    {
+      "name": "l1_logreg-xgboost_brier: paired interval independently recomputed",
+      "passed": true
+    },
+    {
+      "name": "cart-xgboost_auc: paired interval independently recomputed",
+      "passed": true
+    },
+    {
+      "name": "cart-xgboost_brier: paired interval independently recomputed",
+      "passed": true
+    },
+    {
+      "name": "ablation is explicitly exploratory",
+      "passed": true
+    },
+    {
+      "name": "ten paired development repetitions for each model",
+      "passed": true
+    },
+    {
+      "name": "full report numerical inputs are generated",
+      "passed": true
+    },
+    {
+      "name": "report input exists: table1_predictive.tex",
+      "passed": true
+    },
+    {
+      "name": "report input exists: table2_ablation.tex",
+      "passed": true
+    },
+    {
+      "name": "report input exists: table3_ablation_differences.tex",
+      "passed": true
+    }
+  ],
+  "passed": 20,
+  "total": 20,
+  "scope": "Saved-output consistency. No claim that model refitting or raw-data verification ran in report-only mode."
+}

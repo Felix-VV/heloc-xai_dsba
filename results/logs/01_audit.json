@@ -1,0 +1,47 @@
+{
+  "script": "01_audit",
+  "started_utc": "2026-11-18T00:25:07+00:00",
+  "versions": {
+    "python": "3.13.7",
+    "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+    "numpy": "2.5.3",
+    "pandas": "3.0.5",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "xgboost": "3.4.1",
+    "shap": "0.54.1"
+  },
+  "notes": [
+    "population n=9871, design columns=46, dev=7896, test=1975"
+  ],
+  "population": {
+    "n_population": 9871,
+    "n_features_design": 46,
+    "n_original_variables": 23,
+    "excluded": {
+      "all_predictors_minus9": 588
+    },
+    "bad_rate_population": 0.5203120251241009,
+    "n_dev": 7896,
+    "n_test": 1975,
+    "bad_rate_dev": 0.5202634245187436,
+    "bad_rate_test": 0.520506329113924,
+    "groups_with_more_than_one_row": 1,
+    "special_state_rows_excluding_all9": {
+      "ExternalRiskEstimate==-9": 10,
+      "MSinceOldestTradeOpen==-8": 239,
+      "MSinceMostRecentDelq==-7": 4664,
+      "MSinceMostRecentDelq==-8": 176,
+      "MSinceMostRecentInqexcl7days==-7": 1855,
+      "MSinceMostRecentInqexcl7days==-8": 476,
+      "NetFractionRevolvingBurden==-8": 186,
+      "NetFractionInstallBurden==-8": 3419,
+      "NumRevolvingTradesWBalance==-8": 156,
+      "NumInstallTradesWBalance==-8": 861,
+      "NumBank2NatlTradesWHighUtilization==-8": 583,
+      "PercentTradesWBalance==-8": 18
+    }
+  },
+  "elapsed_seconds": 6.9,
+  "finished_utc": "2026-11-18T00:25:14+00:00"
+}

@@ -1,0 +1,26 @@
+PASS splits reproducible from config
+PASS dev/test disjoint and exhaustive
+PASS CV folds use development rows only
+PASS repeated-split rows are development rows only
+PASS y == 1 exactly when RiskPerformance == 'Bad'
+PASS ExternalRiskEstimate negatively associated with Bad  [rho=-0.466]
+PASS LR imputation medians equal development-set medians
+PASS   (development medians differ from full-population medians somewhere)  [confirms the check above is informative]
+PASS LR scaler fitted on development rows (transformed dev mean ≈ 0)
+PASS prediction rows are the test rows
+PASS l1_logreg: saved test predictions reproducible
+PASS l1_logreg: reported test AUC/Brier recomputed on the same rows
+PASS cart: saved test predictions reproducible
+PASS cart: reported test AUC/Brier recomputed on the same rows
+PASS xgboost: saved test predictions reproducible
+PASS xgboost: reported test AUC/Brier recomputed on the same rows
+PASS TreeSHAP additivity on log-odds (base + sum = margin)
+PASS XGB margin is the logit of P(Bad)
+PASS XGB base value = mean margin over background
+PASS LR attributions sum to LR logit
+PASS LR logit is the logit of P(Bad)
+PASS CART classes ordered (0=Good, 1=Bad)
+PASS LR variable count equals variables with non-zero rows in the coefficient table  [19 variables, 30 coefficients]
+PASS report macros file present and generated from JSON
+
+24/24 checks passed

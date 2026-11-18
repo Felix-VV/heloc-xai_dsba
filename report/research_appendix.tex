@@ -1,0 +1,28 @@
+\section{Reading the evidence through the four papers}\label{app:literature}
+
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{2.4cm}>{\raggedright\arraybackslash}p{4.35cm}>{\raggedright\arraybackslash}p{8.65cm}@{}}
+\toprule
+Reading & Claim used in this project & Evidence supplied and remaining boundary \\
+\midrule
+\endhead
+Rudin (2019) & Accurate interpretable alternatives should be seriously attempted in high-stakes structured prediction. & Shared-fold comparison of L1 logistic regression, restricted CART and XGBoost; the no-score extension checks dependence on an undocumented upstream score. These are selected model families, not an exhaustive search over all interpretable models. \\
+Murdoch et al. (2019) & Predictive accuracy, descriptive accuracy and audience relevance are distinct desiderata. & AUC/probability diagnostics, explicit equations and paths, additive decompositions and stability checks are reported separately. User understanding and decision quality are not measured. \\
+Ghassemi et al. (2021) & A plausible explanation cannot certify the validity of an individual decision; validation remains necessary. & Readable but questionable missing-state routings, conditional coefficient signs and prediction variability motivate further validation. Credit-data evidence does not establish a clinical claim, and internal resampling is not external validation. \\
+Goodman and Flaxman (2016/2017) & Algorithmic decisions raise explanation, discrimination and accountability questions. & Inputs, preprocessing, reference populations and limitations are disclosed. No protected attributes are present, so neither absence of discrimination nor legal compliance can be established. \\
+\bottomrule
+\end{longtable}
+
+The four readings are not four votes for the same deployment policy. In particular, Ghassemi et al. do not argue that simply replacing a black box with a transparent model solves safety. Our empirical contribution is to make those distinctions visible within one reproducible credit-risk example, rather than to settle the entire debate.
+
+\section{What exactly is measured?}
+
+For a recorded customer $x$, a model estimates $p(x)=P(Y=\mathrm{Bad}\mid x)$ under the training distribution. ROC-AUC measures ranking between positive and negative observations. Brier is the mean of $(p_i-y_i)^2$; log-loss penalises incorrect confident probabilities. The latter scores are proper probability scores, but should not be described as calibration alone. Reliability curves compare mean prediction with outcome frequency in bins. Logistic recalibration fits $\operatorname{logit}P(Y=1)=a+b\operatorname{logit}(p)$ as a diagnostic; it is not used to refit the reported test probabilities.
+
+For a linear logit model on its transformed inputs $z$, the reference-centred contribution is $\phi_j=w_j(z_j-E_B[Z_j])$, with base value $b+w^T E_B[Z]$. This reconstructs the logit exactly. Interventional TreeSHAP also reconstructs the chosen raw model output, but assigns contributions under its own feature-coalition/reference definition. Such additivity is a computational property, not a sufficient definition of a good explanation, unique internal reasoning or a causal effect. Dummy and special-state contributions are summed back to original variables for display; this is not recomputing a group Shapley game. Independent perturbations may combine encoded states that are not valid joint customer records.
+
+Top-$k$ overlap in this study is $|T_k^{(r)}\cap T_k^{(s)}|/k$, averaged over pairs of fits or reference draws. It is not Jaccard overlap, which is used separately for sets of variables on CART paths. Sign agreement counts contributions with absolute value below 0.01 log-odds as no stable direction; a selected coefficient becoming zero can lower this measure without becoming negative. The separate sign-conflict measure records variables whose contributions have both clearly positive and clearly negative values across runs. Prediction-label instability means that at least two of the 30 fits lie on different sides of 0.5, not the probability of an incorrect bank decision.
+
+\section{Code availability and reproducibility}
+The accompanying code directory contains \texttt{README.md}, \texttt{run\_all.sh}, the locked dependencies, shared configuration, experiment scripts and saved numerical outputs. The raw CSV is retrieved separately and verified against its SHA-256 before loading. Run \texttt{bash run\_all.sh} for the complete experiment, or \texttt{bash run\_all.sh --report-only} to rebuild figures and reports from the included saved results. The latter does not refit models or claim to repeat model-based validation. The full training run includes the model checks and independent numerical checks.
+
+Data source and dictionary limitations are documented in \texttt{data/README.md}. Raw data, environments, caches and fitted model binaries are not included in the GitHub folder. They are recreated locally. Report tables and numerical macros are generated from saved results; class direction, row alignment and probability-output scales are checked explicitly.
